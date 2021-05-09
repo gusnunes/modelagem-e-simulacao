@@ -4,6 +4,121 @@ import numpy as np
 import csv
 from random import random
 
+def gera_tempo_servico(ts):
+  valor_aleatorio = random()   # gera um valor aleatório entre 0 e 1
+  
+  classes = ts["Classes"]
+  intervalos = ts["Intervalo de Valores"]
+  
+  # verifica a qual intervalo o numero aleatório pertence
+  for idx,intervalo in enumerate(intervalos):
+    inicio, fim = intervalo
+    if (valor_aleatorio >= inicio) and (valor_aleatorio <= fim):
+      x, y = classes.loc[idx]
+      ponto_medio = (x+y)/2   # calcula o ponto medio do intervalo da classe
+      break
+
+  return ponto_medio
+
+def gera_tempo_chegada(tec):
+  valor_aleatorio = random()   # gera um valor aleatório entre 0 e 1
+  
+  classes = tec["Classes"]
+  intervalos = tec["Intervalo de Valores"]
+  
+  # verifica a qual intervalo o numero aleatório pertence
+  for idx,intervalo in enumerate(intervalos):
+    inicio, fim = intervalo
+    if (valor_aleatorio >= inicio) and (valor_aleatorio <= fim):
+      x, y = classes.loc[idx]
+      ponto_medio = (x+y)/2   # calcula o ponto medio do intervalo da classe
+      break
+
+  return ponto_medio
+
+def evento_saida(TR,ES,TF,HS, tempos_servicos, tempos_saidas, df_ts):
+  TR = HS
+
+  if TF > 0:
+    TF = TF - 1
+    TS = gera_tempo_servico(df_ts)
+    tempos_servicos.append(TS)
+
+    HS = TR + TS
+    tempos_saidas.append(HS)
+
+  else:
+    ES = 0
+    HS = float("inf")
+  
+  return (TR,ES,TF,HS)
+
+def evento_chegada(TR,ES,TF,HC,HS, tempos_servicos, tempos_saidas, df_tec, df_ts):
+  TR = HC
+  
+  if ES == 0:
+    ES = 1
+    TS = gera_tempo_servico(df_ts)
+    tempos_servicos.append(TS)
+
+    HS = TR + TS
+    tempos_saidas.append(HS)
+
+  else:
+    TF = TF + 1
+  
+  TEC = gera_tempo_chegada(df_tec)
+  HC = TR + TEC
+
+  return (TR,ES,TF,HC,HS)
+
+def realiza_simulacao(tec,ts):
+  cont = 1
+  parada = 10
+
+  # valores iniciais das variáveis
+  TR = ES = TF = HC = 0
+  HS = float("inf")
+
+  colunas = ["Evento","Cliente","TR","ES","TF","HC","HS"]
+  simulacao = pd.DataFrame(columns=colunas)
+  simulacao.loc[0] = ["inicio","_",TR,ES,TF,HC,HS]
+
+  # guarda os tempos de chegadas de todos os clientes
+  tempos_chegadas = []
+
+  # guarda os tempos de servicos de todos os clientes
+  tempos_servicos = []
+
+  # guarda os tempos de saidas de todos os clientes
+  tempos_saidas = []
+
+  clientes = []
+  nome_cliente = 1
+
+  while cont <= parada:
+    if HC < HS:
+      TR,ES,TF,HC,HS = evento_chegada(TR,ES,TF,HC,HS, tempos_servicos, tempos_saidas, tec, ts)
+      
+      simulacao.loc[cont] = ["Chegada",nome_cliente,TR,ES,TF,HC,HS]
+      clientes.insert(0,nome_cliente)
+      nome_cliente+=1
+
+      tempos_chegadas.append(TR)
+
+    else:
+      TR,ES,TF,HS = evento_saida(TR,ES,TF,HS, tempos_servicos, tempos_saidas, ts)
+      cliente = clientes.pop()
+      simulacao.loc[cont] = ["Saida",cliente,TR,ES,TF,HC,HS]
+
+    cont+= 1
+
+# calcula a quantidade de casas decimais que um numero tem
+def precisao(numero):
+  numero = str(numero)
+  casas_decimais = numero[::-1].find('.')
+  return casas_decimais
+
 # insere as frequencias, frequencias acumuladas
 # e intervalo de valores no data frame
 def insere_calculos_tabela(df,intervalos,n):
@@ -20,7 +135,8 @@ def insere_calculos_tabela(df,intervalos,n):
     valores.append(freq_acumulada)   # tempo final do intervalo
     
     # tempo de inicio do próximo intervalo
-    #tempo = transforma(freq_acumulada) + freq_acumulada
+    proximo_inicio = 10**(-1 * precisao(freq_acumulada))
+    tempo = proximo_inicio + freq_acumulada
 
     df.loc[idx,"Frequência"] = frequencia
     df.loc[idx,"Frequência Acumulada"] = freq_acumulada
@@ -78,8 +194,8 @@ def mmc(data):
   
   intervalos = calcula_intervalos_classes(df,K,h)
   intervalos = calcula_quantidade_valoes(data,intervalos)
-
   insere_calculos_tabela(df,intervalos,n)
+  
   return df
 
 # tratamento dos dados para remoção de outliers
@@ -113,7 +229,11 @@ def main():
   tec = le_dados("TEC.csv")
   tec = trata_dados(tec)
   tec = mmc(tec)
-  print(tec)
 
+  # por enquanto 
+  ts = tec
+
+  realiza_simulacao(tec,ts)
+  
 if __name__ == "__main__":
   main()
