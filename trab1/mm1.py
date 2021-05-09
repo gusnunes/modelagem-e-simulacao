@@ -4,6 +4,55 @@ import numpy as np
 import csv
 from random import random
 
+def letra_c_d(simulacao):
+  tempo_sistema = 0
+
+  # clientes que entraram e sairam do sistema
+  saidas = simulacao.loc[simulacao['Evento']=="Saida"]
+  for idx, cliente in saidas.iterrows():
+    nome_cliente = cliente["Cliente"]
+    
+    chegada = simulacao.loc[(simulacao['Evento'] == "Chegada")
+                            & (simulacao["Cliente"] == nome_cliente)]
+    
+    # pega o horário de chegada e saida do cliente
+    chegada = chegada["TR"].values[0]
+    saida = cliente["TR"]
+
+    tempo_sistema += saida - chegada
+
+  qtd_entidade = saidas.shape[0]
+  media = (tempo_sistema)/(qtd_entidade)
+  print("Tempo Médio no Sistema:", media)
+
+def letra_a_b(simulacao):
+  tempo_fila = 0
+  tempo_servidor = 0
+  tempo_total = 0
+
+  linhas = simulacao.shape[0]
+  for idx in range(linhas-1):
+    # intervalo de tempo entre dois eventos
+    intervalo = simulacao.loc[idx+1,"TR"] - simulacao.loc[idx,"TR"] 
+    
+    # tempo que a fila permaneceu com a mesma quantidade
+    TF = simulacao.loc[idx,"TF"]   # TF é peso do intervalo
+    tempo_fila += intervalo * TF
+
+    # tempo que o servidor permaneceu constante
+    ES = simulacao.loc[idx,"ES"] # ES é peso do intervalo
+    tempo_servidor += intervalo * ES
+
+    tempo_total += intervalo
+
+  # Número Médio de Entidades nas Filas
+  entidade_fila = tempo_fila/tempo_total
+  print("\nNúmero Médio de Entidades nas Filas:", entidade_fila)
+
+  # Taxa Média de Ocupação dos Servidores:
+  ocupacao_servidor = tempo_servidor/tempo_total
+  print("Taxa Média de Ocupação dos Servidores:", ocupacao_servidor)
+
 def gera_tempo_servico(ts):
   valor_aleatorio = random()   # gera um valor aleatório entre 0 e 1
   
@@ -234,14 +283,24 @@ def le_dados(nome_arquivo):
 
 def main():
   tec = le_dados("TEC.csv")
-  #tec = trata_dados(tec)
-  tec = mmc(sorted(tec))
-  print(tec)
+  tec = trata_dados(tec)
+  tec = mmc(tec)
+  print("\nFreqüências e valores empregados no MMC: TEC\n")
+  print(tec.to_string(index=False))
 
   # por enquanto 
   ts = tec
 
-  resultado = realiza_simulacao(tec,ts)
+  # fazer amanha, arrendodar os valores para 4 quando estiver inserindos eles
+  # parece que fica mais facil com esse raciocionio
+
+  resultado_simulacao = realiza_simulacao(tec,ts)
+  print("\n\nResultado da Simualção:\n")
+  print(resultado_simulacao.to_string(index=False))
+
+  # relatório final contendo todas as estatísticas desejadas
+  letra_a_b(resultado_simulacao)
+  letra_c_d(resultado_simulacao)
   
 if __name__ == "__main__":
   main()
