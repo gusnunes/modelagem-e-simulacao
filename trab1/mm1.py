@@ -13,6 +13,7 @@ def gera_tempo_servico(ts):
   # verifica a qual intervalo o numero aleatório pertence
   for idx,intervalo in enumerate(intervalos):
     inicio, fim = intervalo
+    valor_aleatorio = round(valor_aleatorio,precisao(fim))
     if (valor_aleatorio >= inicio) and (valor_aleatorio <= fim):
       x, y = classes.loc[idx]
       ponto_medio = (x+y)/2   # calcula o ponto medio do intervalo da classe
@@ -29,6 +30,7 @@ def gera_tempo_chegada(tec):
   # verifica a qual intervalo o numero aleatório pertence
   for idx,intervalo in enumerate(intervalos):
     inicio, fim = intervalo
+    valor_aleatorio = round(valor_aleatorio,precisao(fim))
     if (valor_aleatorio >= inicio) and (valor_aleatorio <= fim):
       x, y = classes.loc[idx]
       ponto_medio = (x+y)/2   # calcula o ponto medio do intervalo da classe
@@ -80,6 +82,7 @@ def realiza_simulacao(tec,ts):
   TR = ES = TF = HC = 0
   HS = float("inf")
 
+  # data frame que guarda as informações da simualação
   colunas = ["Evento","Cliente","TR","ES","TF","HC","HS"]
   simulacao = pd.DataFrame(columns=colunas)
   simulacao.loc[0] = ["inicio","_",TR,ES,TF,HC,HS]
@@ -112,6 +115,8 @@ def realiza_simulacao(tec,ts):
       simulacao.loc[cont] = ["Saida",cliente,TR,ES,TF,HC,HS]
 
     cont+= 1
+  
+  return simulacao
 
 # calcula a quantidade de casas decimais que um numero tem
 def precisao(numero):
@@ -136,6 +141,8 @@ def insere_calculos_tabela(df,intervalos,n):
     
     # tempo de inicio do próximo intervalo
     proximo_inicio = 10**(-1 * precisao(freq_acumulada))
+    if proximo_inicio == 0.1:
+      proximo_inicio = 0.01
     tempo = proximo_inicio + freq_acumulada
 
     df.loc[idx,"Frequência"] = frequencia
@@ -227,13 +234,14 @@ def le_dados(nome_arquivo):
 
 def main():
   tec = le_dados("TEC.csv")
-  tec = trata_dados(tec)
-  tec = mmc(tec)
+  #tec = trata_dados(tec)
+  tec = mmc(sorted(tec))
+  print(tec)
 
   # por enquanto 
   ts = tec
 
-  realiza_simulacao(tec,ts)
+  resultado = realiza_simulacao(tec,ts)
   
 if __name__ == "__main__":
   main()
