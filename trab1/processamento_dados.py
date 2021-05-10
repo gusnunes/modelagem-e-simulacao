@@ -106,6 +106,12 @@ def trata_dados(data):
   data = np.delete(data, np.argwhere( (data < lim_inf) | (data > lim_sup) ))
   return data
 
+# cria um arquivo csv com apenas um valor
+def escreve_arquivo(nome_arquivo, valor):
+    with open(nome_arquivo, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([valor])
+
 # lê os dados da tabela de tempos (entre chegadas ou serviços)
 def le_dados(nome_arquivo):
   with open(nome_arquivo, 'r') as csvfile:
