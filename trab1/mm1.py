@@ -46,8 +46,7 @@ def evento_saida(TR,ES,TF,HS,df_ts):
   if TF > 0:
     TF = TF - 1
     TS = gera_tempo_servico(df_ts)
-
-    HS = TR + TS
+    HS = TR + TS   # agenda a próxima saida
 
   else:
     ES = 0
@@ -58,17 +57,17 @@ def evento_saida(TR,ES,TF,HS,df_ts):
 def evento_chegada(TR,ES,TF,HC,HS, df_tec, df_ts):
   TR = HC
   
+  # servidor está ocioso
   if ES == 0:
     ES = 1
     TS = gera_tempo_servico(df_ts)
-
-    HS = TR + TS
+    HS = TR + TS   # agenda a próxima saida
 
   else:
     TF = TF + 1
   
   TEC = gera_tempo_chegada(df_tec)
-  HC = TR + TEC
+  HC = TR + TEC   # agenda a próxima chegada
 
   return (TR,ES,TF,HC,HS)
 
