@@ -105,17 +105,41 @@ def realiza_simulacao(tec,ts):
   return simulacao
 
 def main():
-  tec = le_dados("TEC.csv")
+  # Opções dos Tempos entre Chegadas
+  tec_option = input("O TEC é deterministico? [s/n]: ")
+  if tec_option == 's':
+    tec_valor = input("Digite o TEC: ")
+    escreve_arquivo("TEC_deterministico.csv", tec_valor)
+    tec = le_dados("TEC_deterministico.csv")
+  
+  else:
+    tec_file = input("Digite o nome do arquivo da coleta do TEC: ")
+    tec = le_dados(tec_file)
+
+  # # Opções dos Tempo de Serviços
+  ts_option = input("\nO TS é deterministico? [s/n]: ")
+  if ts_option == 's':
+    ts_valor = input("Digite o TS: ")
+    escreve_arquivo("TS_deterministico.csv", ts_valor)
+    ts = le_dados("TS_deterministico.csv")
+  
+  else:
+    ts_file = input("Digite o nome do arquivo da coleta do TS: ")
+    ts = le_dados(ts_file)
+
+  # realizada tratamento dos dados
   tec = trata_dados(tec)
+  ts = trata_dados(ts)
+
+  # tabela do Método de Monte Carlo
   tec = mmc(tec)
   print("\nFrequências e valores empregados no MMC: TEC\n")
   print(tec.to_string(index=False))
+  
+  ts = mmc(ts)
+  print("\n\nFrequências e valores empregados no MMC: TS\n")
+  print(ts.to_string(index=False))
 
-  # por enquanto 
-  ts = tec
-
-  # fazer amanha, arrendodar os valores para 4 quando estiver inserindos eles
-  # parece que fica mais facil com esse raciocionio
 
   resultado_simulacao = realiza_simulacao(tec,ts)
   print("\n\nResultado da Simulação:\n")
