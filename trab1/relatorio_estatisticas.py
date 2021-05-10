@@ -26,7 +26,7 @@ def tempo_entidade_fila(simulacao):
       print("Tempo Médio de uma Entidade na Fila:", 0.0)
   
   # somente chegadas e nenhuma saida (no periodo da simulação)
-  # ou teve fila, mas sem o tempo que o cliente permanceceu nela (nao tem a saida dele) 
+  # ou teve fila, mas sem o tempo que o cliente permaneceu nela (nao tem a saida dele) 
   elif not clientes_fila.empty and qtd_clientes==0:
       print("Tempo Médio de uma Entidade na Fila:", 0.0)
 
