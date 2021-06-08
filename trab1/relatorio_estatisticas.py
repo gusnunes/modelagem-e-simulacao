@@ -1,5 +1,7 @@
 # Tempo Médio de uma Entidade na Fila
 def tempo_entidade_fila(simulacao):
+  tempo_fila = 0
+
   # clientes que enfrentaram fila
   clientes_fila = simulacao.loc[(simulacao['Evento'] == "Chegada") 
                                 & (simulacao["TF"]>0)]
@@ -19,7 +21,7 @@ def tempo_entidade_fila(simulacao):
     if not cliente_anterior.empty:
       qtd_clientes += 1
       saida = cliente_anterior["TR"].values[0]
-      tempo_fila = saida - entrada
+      tempo_fila += saida - entrada
 
   # nao teve fila
   if clientes_fila.empty:
