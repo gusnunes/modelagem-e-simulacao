@@ -25,5 +25,19 @@ def tempo_entidade_fila(simulacao):
     print("Tempo Médio de uma Entidade na Fila:", media)
 
 # Tempo Médio no Sistema
-def tempo_sistema():
-    pass
+def tempo_sistema(simulacao):
+    tempo_sistema = 0
+    qtd_clientes = simulacao.shape[0]
+
+    for cliente in simulacao.itertuples(index=False):
+        # entrada e saida do cliente do sistema
+        tempo_entrada = cliente[simulacao.columns.get_loc("TR")] 
+        tempo_saida = cliente[simulacao.columns.get_loc("TS-F")]
+
+        # tempo que o cliente permaneceu no sistema
+        tempo_cliente = tempo_saida - tempo_entrada
+
+        # a soma dos tempos de todos os clientes
+        tempo_sistema += tempo_cliente
+        
+    print("Tempo Médio no Sistema:", tempo_sistema/qtd_clientes)
