@@ -1,14 +1,16 @@
 # Taxa Média de Ocupação dos Servidores
 def ocupacao_servidores(simulacao, qtd_atendentes):
-    for nome_atendente in range(1,qtd_atendentes+1):
+    for nome_atendente in range(1,3):
         atendente = simulacao.loc[simulacao["Atendente"] == nome_atendente]
         atendente = atendente.reset_index(drop=True)
 
-        soma_tempo_servico = atendente["TS"].sum()
-        periodo = (atendente.iloc[-1:]["TS-F"]).item()   # último tempo de serviço do atendente 
-        
-        ocupacao_servidor = soma_tempo_servico/periodo
-        print(f"Taxa Média de Ocupação do Servidor {nome_atendente}:", ocupacao_servidor)
+        # servidor atendeu pelo menos um cliente
+        if not atendente.empty:
+            soma_tempo_servico = atendente["TS"].sum()
+            periodo = (atendente.iloc[-1:]["TS-F"]).item()   # último tempo de serviço do atendente 
+            
+            ocupacao_servidor = soma_tempo_servico/periodo
+            print(f"Taxa Média de Ocupação do Servidor {nome_atendente}:", ocupacao_servidor)
 
 
 # Tempo Médio de uma Entidade na Fila
