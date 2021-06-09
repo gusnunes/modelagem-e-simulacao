@@ -1,6 +1,8 @@
 import pandas as pd
 
 from distribuicoes import *
+from relatorio_estatisticas import *
+
 import random
 
 class Atendente:
@@ -10,7 +12,7 @@ class Atendente:
         self.TS = 0
         self.TS_F = 0
 
-    def tempo_servico(self, opcao):
+    def gera_tempo_servico(self, opcao):
         if opcao == "exponencial":
             ts = distribuicao_exponencial(10)
         
@@ -20,7 +22,7 @@ class Atendente:
         return random.randint(0,30)
 
 
-def realiza_simulacao(num_atendentes=2):
+def realiza_simulacao(qtd_atendentes=2):
     TR = TEC = TF = 0
     fila = []
 
@@ -29,7 +31,7 @@ def realiza_simulacao(num_atendentes=2):
     simulacao = pd.DataFrame(columns=colunas)
     
     # quantidade de atendentes do sistema
-    atendentes = [Atendente(i+1) for i in range(num_atendentes)]
+    atendentes = [Atendente(i+1) for i in range(qtd_atendentes)]
 
     for i in range(10):
         # menor tempo final de serviço
@@ -62,7 +64,7 @@ def realiza_simulacao(num_atendentes=2):
             print(fila)
 
         
-        atendente_disponivel.TS = atendente_disponivel.tempo_servico(1)
+        atendente_disponivel.TS = atendente_disponivel.gera_tempo_servico(1)
         atendente_disponivel.TS_F = atendente_disponivel.TS_I + atendente_disponivel.TS
 
         TF = atendente_disponivel.TS_I - TR
@@ -74,9 +76,16 @@ def realiza_simulacao(num_atendentes=2):
         TEC = random.randint(0,30)
         TR += TEC
     
-    print(simulacao.to_string(index=False))
+    return simulacao
 
 def main():
-    realiza_simulacao()
+    atendentes = 2
+    resultado_simulacao = realiza_simulacao(qtd_atendentes=atendentes)
+    print(resultado_simulacao.to_string(index=False))
+
+    print("")
+    tempo_entidade_fila(resultado_simulacao)
+    ocupacao_servidores(resultado_simulacao,atendentes)
+    tempo_sistema(resultado_simulacao)
 
 main()
