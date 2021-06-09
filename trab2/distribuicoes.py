@@ -2,11 +2,11 @@ from random import random
 from math import log,cos,pi,sqrt
 
 # método da transformação inversa
-def distribuicao_exponencial(lambd):
+def distribuicao_exponencial(lambda_):
     # valor de uma distribuição uniforme (0,1)
     u = random()   
     
-    x = (-1/lambd)*log(1-u)
+    x = (-1/lambda_)*log(1-u)
     return x
 
 # método Box-Muller
