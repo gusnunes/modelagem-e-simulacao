@@ -1,6 +1,6 @@
 # Taxa Média de Ocupação dos Servidores
 def ocupacao_servidores(simulacao, qtd_atendentes):
-    for nome_atendente in range(1,3):
+    for nome_atendente in range(1,qtd_atendentes+1):
         atendente = simulacao.loc[simulacao["Atendente"] == nome_atendente]
         atendente = atendente.reset_index(drop=True)
 
