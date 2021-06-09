@@ -1,54 +1,80 @@
-from trab2.distribuicoes import distribuicao_exponencial
+import pandas as pd
+
 from distribuicoes import *
+import random
 
 class Atendente:
     def __init__(self, nome):
         self.nome = nome
-        self.ocupado = 0
         self.TS_I = 0
         self.TS = 0
         self.TS_F = 0
 
-    def tempo_servico():
-        ts = distribuicao_exponencial(10)
-        return ts
+    def tempo_servico(self, opcao):
+        if opcao == "exponencial":
+            ts = distribuicao_exponencial(10)
+        
+        elif opcao == "normal":
+            ts = distribuicao_normal(10,20)
+       
+        return random.randint(0,30)
 
 
-def realiza_simulacao():
+def realiza_simulacao(num_atendentes=2):
     TR = TEC = TF = 0
+    fila = []
 
-    # numero de atendentes
-    n = 2
+    # data frame que guarda as informações da simulação
+    colunas = ["Cliente","TEC","TR","Atendente","TS-I","TS","TS-F","TF"]
+    simulacao = pd.DataFrame(columns=colunas)
     
-    atendentes = [Atendente(i+1) for i in range(n)]
+    # quantidade de atendentes do sistema
+    atendentes = [Atendente(i+1) for i in range(num_atendentes)]
 
-    for _ in range(30):
+    for i in range(10):
         # menor tempo final de serviço
         menor_tempo = float("inf")
 
         for atendente in atendentes:
-            # qual atendente ficará desocupado primeiro (se tiver fila)
+            # qual atendente ficará desocupado primeiro (tem fila)
             if atendente.TS_F < menor_tempo:
                 menor_tempo = atendente.TS_F
                 atendente_disponivel = atendente
             
             # qual atendente está desocupado (sem fila)
             if TR >= atendente.TS_F:
+                atendente.TS_I = TR
                 atendente_disponivel = atendente
-
-                TF = 0
                 break
         
-        else:   # todos atendentes estão ocupados
-            TF += 1
+        # todos os atendentes estão ocupados
+        else:
+            atendente_disponivel.TS_I = atendente_disponivel.TS_F
+            
+            # controlar quantidade de entidades prsentes na fila
+            for entidade in fila:
+                tempo_inicio = entidade   # quando a entidade da fila vai ser atendida
+                if TR >= tempo_inicio:
+                    fila.remove(tempo_inicio) 
 
-        atendente_disponivel.TS_I = TR
-        atendente_disponivel.TS = atendente.tempo_servico()
-        atendente_disponivel.TS_F = atendente.TS_I + atendente.TS
+            fila.append(atendente_disponivel.TS_I)
+            
+            print(fila)
 
+        
+        atendente_disponivel.TS = atendente_disponivel.tempo_servico(1)
+        atendente_disponivel.TS_F = atendente_disponivel.TS_I + atendente_disponivel.TS
 
-    TEC = distribuicao_exponencial(10)
-    TR += TEC
+        TF = atendente_disponivel.TS_I - TR
+
+        simulacao.loc[i] = [i+1,TEC,TR,atendente_disponivel.nome,atendente_disponivel.TS_I, 
+            atendente_disponivel.TS,atendente_disponivel.TS_F,TF] 
+        
+        #TEC = distribuicao_exponencial(10)
+        TEC = random.randint(0,30)
+        TR += TEC
+    
+    print(simulacao.to_string(index=False))
 
 def main():
     realiza_simulacao()
