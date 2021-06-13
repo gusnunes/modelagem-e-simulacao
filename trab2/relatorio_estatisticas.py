@@ -1,3 +1,14 @@
+# Número Médio de Entidades nas Filas
+def entidades_fila(simulacao):
+    # tempo final da simulação
+    tempo_final = simulacao["TS-F"].max()
+
+    # soma dos tempos que as entidades ficaram na fila 
+    soma_tempos = simulacao["TF"].sum()
+
+    numero_medio = soma_tempos/tempo_final
+    print("Número Médio de Entidades nas Filas:", numero_medio)
+
 # Taxa Média de Ocupação dos Servidores
 def ocupacao_servidores(simulacao, qtd_atendentes):
     for nome_atendente in range(1,qtd_atendentes+1):
@@ -14,7 +25,7 @@ def ocupacao_servidores(simulacao, qtd_atendentes):
 
 
 # Tempo Médio de uma Entidade na Fila
-def tempo_entidade_fila(simulacao):
+def tempo_fila(simulacao):
     entidades = simulacao.loc[simulacao["TF"] > 0]   # entidades que entraram na fila
     soma_tempos = entidades["TF"].sum()   # soma dos tempos que as entidades ficaram na fila
     qtd_entidades = entidades.shape[0]   # quantas entidades entraram na fila
