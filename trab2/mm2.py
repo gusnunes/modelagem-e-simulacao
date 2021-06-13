@@ -33,17 +33,10 @@ def realiza_simulacao(qtd_atendentes=2):
     # quantidade de atendentes do sistema
     atendentes = [Atendente(i+1) for i in range(qtd_atendentes)]
 
-    for i in range(10):
-        # menor tempo final de serviço
-        menor_tempo = float("inf")
-
+    chegadas = 10   # limite da execução da simulação
+    for i in range(chegadas):
         for atendente in atendentes:
-            # qual atendente ficará desocupado primeiro (tem fila)
-            if atendente.TS_F < menor_tempo:
-                menor_tempo = atendente.TS_F
-                atendente_disponivel = atendente
-            
-            # qual atendente está desocupado (sem fila)
+            # atendente está desocupado
             if TR >= atendente.TS_F:
                 atendente.TS_I = TR
                 atendente_disponivel = atendente
@@ -51,9 +44,11 @@ def realiza_simulacao(qtd_atendentes=2):
         
         # todos os atendentes estão ocupados
         else:
+            # qual atendente ficará disponível primeiro
+            atendente_disponivel = min(atendentes, key=lambda x: x.TS_F)
             atendente_disponivel.TS_I = atendente_disponivel.TS_F
             
-            # controlar quantidade de entidades prsentes na fila
+            # controlar quantidade de entidades presentes na fila
             for entidade in fila:
                 tempo_inicio = entidade   # quando a entidade da fila vai ser atendida
                 if TR >= tempo_inicio:
@@ -73,7 +68,7 @@ def realiza_simulacao(qtd_atendentes=2):
             atendente_disponivel.TS,atendente_disponivel.TS_F,TF] 
         
         #TEC = distribuicao_exponencial(10)
-        TEC = random.randint(0,30)
+        TEC = random.randint(0,20)
         TR += TEC
     
     return simulacao
@@ -84,8 +79,9 @@ def main():
     print(resultado_simulacao.to_string(index=False))
 
     print("")
-    tempo_entidade_fila(resultado_simulacao)
+    entidades_fila(resultado_simulacao)
+    tempo_fila(resultado_simulacao)
     ocupacao_servidores(resultado_simulacao,atendentes)
     tempo_sistema(resultado_simulacao)
-
+    
 main()
