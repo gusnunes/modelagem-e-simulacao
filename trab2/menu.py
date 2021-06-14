@@ -30,5 +30,12 @@ def menu():
             ts_nome = "normal"
             parametros = input("Digite a média e desvio padrão: ").split()
             ts_valor = (float(parametros[0]),float(parametros[1]))
+    
+    # Opções de limite de fila
+    fila_opcao = input("Limite de fila? [s/n]: ")
+    if fila_opcao == 's':
+        limite_fila = int(input("Digite o limite da fila: "))
+    else:
+        limite_fila = float("inf")
 
-    return (tec_nome,tec_valor,ts_nome,ts_valor)
+    return (tec_nome,tec_valor,ts_nome,ts_valor,limite_fila)
