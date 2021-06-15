@@ -119,10 +119,14 @@ def main():
     resultado_simulacao[["Cliente","Atendente"]] = resultado_simulacao[["Cliente","Atendente"]].astype(int)
     print(resultado_simulacao.to_string(index=False))
 
-    print("")
-    entidades_fila(resultado_simulacao)
-    tempo_fila(resultado_simulacao)
-    ocupacao_servidores(resultado_simulacao,atendentes)
-    tempo_sistema(resultado_simulacao)
+    # relatório das estatísticas
+    print("\nNúmero Médio de Entidades nas Filas:", entidades_fila(resultado_simulacao))
+    print("Tempo Médio de uma Entidade na Fila:", tempo_fila(resultado_simulacao))
+    print("Tempo Médio no Sistema:", tempo_sistema(resultado_simulacao))
+
+    medias = ocupacao_servidores(resultado_simulacao,atendentes)
+    for atendente,media in enumerate(medias):
+        print(f"Taxa Média de Ocupação do Servidor {atendente+1}:", media)
     
-main()
+if __name__ == '__main__':
+    main()
