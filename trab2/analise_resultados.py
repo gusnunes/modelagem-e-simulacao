@@ -43,18 +43,29 @@ def replica_simulacao(qtd_replicacoes):
     medias = [entidades,tempos_fila,tempos_sistema, ocupacoes]
     return medias
 
+def imprime_estatisticas(medias):
+    # relatório das estatísticas
+    print("\nNúmero Médio de Entidades nas Filas:", np.mean(medias[0]))
+    print("Tempo Médio de uma Entidade na Fila:", np.mean(medias[1]))
+    print("Tempo Médio no Sistema:", np.mean(medias[2]))
+
+    for atendente,media in enumerate(medias[3]):
+        print(f"Taxa Média de Ocupação do Servidor {atendente+1}:", np.mean(media))
+
 def main():
     quantidade = 24
     medias = replica_simulacao(quantidade)
 
     plota_medias(medias,quantidade)
+    print(f"\nRelatório das médias das {quantidade} primeiras replicações:")
+    imprime_estatisticas(medias)
 
     # calcula o intervalo de confiança de 95%
-    medias = medias[:-1]
     nova_estimativa = []
     replicar = False
+    maior_replicacao = 0
     
-    for media in medias:
+    for media in medias[:-1]:
         mean,sigma = np.mean(media), np.std(media)
         erro_padrao = sigma/(len(media)**0.5)
         
@@ -74,13 +85,7 @@ def main():
         medias = replica_simulacao(round(maior_replicacao))
 
     plota_medias(medias,round(maior_replicacao))
-
-    # relatório das estatísticas
-    print("\nNúmero Médio de Entidades nas Filas:", np.mean(medias[0]))
-    print("Tempo Médio de uma Entidade na Fila:", np.mean(medias[1]))
-    print("Tempo Médio no Sistema:", np.mean(medias[2]))
-
-    for atendente,media in enumerate(medias[3]):
-        print(f"Taxa Média de Ocupação do Servidor {atendente+1}:", np.mean(media))
+    print(f"\n\nRelatório das médias após mais {round(maior_replicacao)} replicações:")
+    imprime_estatisticas(medias)
 
 main()
