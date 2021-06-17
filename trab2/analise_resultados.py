@@ -57,7 +57,7 @@ def main():
     medias = replica_simulacao(quantidade)
 
     plota_medias(medias,quantidade)
-    print(f"\nRelatório das médias das {quantidade} primeiras replicações:")
+    print(f"\nRelatório das médias após {quantidade} replicações:")
     imprime_estatisticas(medias)
 
     # calcula o intervalo de confiança de 95%
